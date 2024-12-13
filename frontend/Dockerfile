@@ -12,6 +12,9 @@ COPY package*.json ./
 # 依存関係のインストール
 RUN npm install
 
+# Viteを明示的にグローバルインストール
+RUN npm install -g vite
+
 # ソースコードをコピー
 COPY . .
 
