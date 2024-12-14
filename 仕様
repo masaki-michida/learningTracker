@@ -1,0 +1,24 @@
+backend: spring boot
+frontend: react+vite+ts
+database: postgresql
+docker
+docker compose
+
+javaライブラリ
+lombok...getter,setter,toString,equals,hashCodeメソッドを自動生成してコードの冗長性を減らしてくれる
+ORMフレームワーク
+jpa...データベースとのやり取りを簡単にするためのフレームワーク
+
+MVCアーキテクチャ
+RESTful API+React
+
+データの流れ
+クライアント（React）からリクエスト
+Controller（@RestController）がリクエストを受け取る
+Service（@Service）でビジネスロジックを処理
+Repository（@Repository）でデータベース操作
+結果をControllerを通じてクライアントに返す
+
+疑問
+getter...変数を取り出すだけのメソッド
+setter...変数に値をセットするだけのメソッド
