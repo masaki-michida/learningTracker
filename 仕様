@@ -9,6 +9,9 @@ lombok...getter,setter,toString,equals,hashCodeメソッドを自動生成して
 ORMフレームワーク
 jpa...データベースとのやり取りを簡単にするためのフレームワーク
 
+ログイン認証
+spring security...ユーザー認証と認可を管理するためのフレームワーク
+
 MVCアーキテクチャ
 RESTful API+React
 
@@ -22,3 +25,31 @@ Repository（@Repository）でデータベース操作
 疑問
 getter...変数を取り出すだけのメソッド
 setter...変数に値をセットするだけのメソッド
+
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── LearningRecordForm.tsx    # 学習記録入力フォーム
+│   │   └── LearningRecordList.tsx    # 学習記録一覧表示
+│   ├── pages/
+│   │   └── LearningRecordPage.tsx    # メインページ（フォームと一覧を統合）
+│   ├── types/
+│   │   └── LearningRecord.ts         # TypeScript型定義
+│   ├── App.tsx                       # アプリケーションのルート
+│   ├── main.tsx                      # エントリーポイント
+│   └── index.css                     # スタイル定義
+
+backend/
+├── src/main/java/com/example/learningTracker/
+│   ├── controller/
+│   │   └── LearningRecordController.java  # APIエンドポイント定義
+│   ├── model/
+│   │   └── LearningRecord.java            # データモデル
+│   ├── repository/
+│   │   └── LearningRecordRepository.java  # データベースアクセス
+│   ├── config/
+│   │   └── CorsConfig.java                # CORS設定
+│   └── LearningTrackerApplication.java    # アプリケーション起動
+├── src/main/resources/
+│   └── application.properties             # アプリケーション設定
+└── pom.xml                                # 依存関係管理
