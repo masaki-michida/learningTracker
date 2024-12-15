@@ -1,6 +1,6 @@
 // src/components/LearningRecordForm.tsx
 
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 
 interface LearningRecordInput {
   title: string;
@@ -8,7 +8,11 @@ interface LearningRecordInput {
   studyMinutes: number;
 }
 
-const LearningRecordForm: React.FC = () => {
+interface Props {
+    onRecordSubmit: () => void;
+}
+
+const LearningRecordForm: React.FC<Props> = ({ onRecordSubmit }) => {
     const [formData, setFormData] = useState<LearningRecordInput>({
         title: '',
         content: '',
@@ -17,20 +21,20 @@ const LearningRecordForm: React.FC = () => {
 
     // 入力変更時のハンドラー
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev: LearningRecordInput) => ({
             ...prev,
             [name]: name === 'studyMinutes' ? parseInt(value) || 0 : value
         }));
     };
 
     // フォーム送信時のハンドラー
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8080/', {
+            const response = await fetch('http://localhost:8080/api/learning-records', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -38,12 +42,12 @@ const LearningRecordForm: React.FC = () => {
                 body: JSON.stringify(formData)
             });
             if (response.ok) {
-                // 成功時の処理（フォームクリアなど）
                 setFormData({
                     title: '',
                     content: '',
                     studyMinutes: 0
                 });
+                onRecordSubmit();
                 alert('記録を保存しました！');
             }
         } catch (error) {
