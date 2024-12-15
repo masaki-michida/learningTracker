@@ -1,34 +1,34 @@
-// backend/src/main/java/com/example/learningTracker/model/LearningRecord.java
-
 package com.example.learningTracker.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
-public class LearningRecord {
+@NoArgsConstructor
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String title;
-    private String content;
-    private Integer studyMinutes;
+    @Column(nullable = false)
+    private String username;
+    
+    @Column(unique = true, nullable = false)
+    private String email;
+    
+    @Column(nullable = false)
+    private String password;
+    
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
     }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-}
+} 
