@@ -2,6 +2,7 @@ package com.example.learningTracker.controller;
 
 import com.example.learningTracker.model.User;
 import com.example.learningTracker.repository.UserRepository;
+import com.example.learningTracker.service.AuthService;
 import com.example.learningTracker.dto.LoginRequest;
 import com.example.learningTracker.dto.LoginResponse;
 import com.example.learningTracker.dto.RegisterResponse;
@@ -24,45 +25,26 @@ public class AuthController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
-            log.info("Registering new user with email: {}", user.getEmail());
-            
-            if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
-                return ResponseEntity
-                    .badRequest()
-                    .body(new RegisterResponse("必須項目が入力されていません"));
-            }
-
-            // メールアドレスの重複チェック
-            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-                log.info("Email already exists: {}", user.getEmail());
-                return ResponseEntity
-                    .badRequest()
-                    .body(new RegisterResponse("このメールアドレスは既に登録されています"));
-            }
-
-            // パスワードのハッシュ化
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            User savedUser = userRepository.save(user);
-            log.info("User registered successfully with id: {}", savedUser.getId());
-            
+            User registeredUser = authService.registerUser(user);
             return ResponseEntity.ok(new RegisterResponse("ユーザー登録が完了しました"));
-            
-        } catch (Exception e) {
-            log.error("Error during user registration", e);
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new RegisterResponse("登録中にエラーが発生しました: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new RegisterResponse(e.getMessage()));
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        return userRepository.findByEmail(loginRequest.getEmail())
-            .filter(user -> passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
-            .map(user -> ResponseEntity.ok().body(new LoginResponse("ログイン成功")))
-            .orElse(ResponseEntity.badRequest().body(new LoginResponse("メールアドレスまたはパスワードが間違っています")));
+        try {
+            User user = authService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+            return ResponseEntity.ok(new LoginResponse("ログイン成功"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new LoginResponse(e.getMessage()));
+        }
     }
 } 
