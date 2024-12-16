@@ -26,30 +26,56 @@ Repository（@Repository）でデータベース操作
 getter...変数を取り出すだけのメソッド
 setter...変数に値をセットするだけのメソッド
 
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── LearningRecordForm.tsx    # 学習記録入力フォーム
-│   │   └── LearningRecordList.tsx    # 学習記録一覧表示
-│   ├── pages/
-│   │   └── LearningRecordPage.tsx    # メインページ（フォームと一覧を統合）
-│   ├── types/
-│   │   └── LearningRecord.ts         # TypeScript型定義
-│   ├── App.tsx                       # アプリケーションのルート
-│   ├── main.tsx                      # エントリーポイント
-│   └── index.css                     # スタイル定義
-
-backend/
-├── src/main/java/com/example/learningTracker/
-│   ├── controller/
-│   │   └── LearningRecordController.java  # APIエンドポイント定義
-│   ├── model/
-│   │   └── LearningRecord.java            # データモデル
-│   ├── repository/
-│   │   └── LearningRecordRepository.java  # データベースアクセス
-│   ├── config/
-│   │   └── CorsConfig.java                # CORS設定
-│   └── LearningTrackerApplication.java    # アプリケーション起動
-├── src/main/resources/
-│   └── application.properties             # アプリケーション設定
-└── pom.xml                                # 依存関係管理
+project-root/
+├── backend/                     # バックエンドアプリケーション
+│   ├── src/main/java/com/example/learningTracker/
+│   │   ├── config/             # 設定ファイル
+│   │   │   ├── CorsConfig.java     # フロントエンドとの通信設定
+│   │   │   └── SecurityConfig.java  # セキュリティ設定
+│   │   │
+│   │   ├── controller/         # APIエンドポイント
+│   │   │   ├── AuthController.java        # 認証関連API
+│   │   │   └── LearningRecordController.java  # 学習記録API
+│   │   │
+│   │   ├── model/             # データモデル
+│   │   │   ├── User.java          # ユーザーエンティティ
+│   │   │   └── LearningRecord.java # 学習記録エンティティ
+│   │   │
+│   │   ├── repository/        # データベースアクセス
+│   │   │   ├── UserRepository.java
+│   │   │   └── LearningRecordRepository.java
+│   │   │
+│   │   ├── dto/              # データ転送オブジェクト
+│   │   │   ├── LoginRequest.java
+│   │   │   ├── LoginResponse.java
+│   │   │   └── RegisterResponse.java
+│   │   │
+│   │   └── LearningTrackerApplication.java  # メインアプリケーション
+│   │
+│   └── resources/            # リソースファイル
+│       └── application.properties  # アプリケーション設定
+│
+├── frontend/                 # フロントエンドアプリケーション
+│   ├── src/
+│   │   ├── components/      # Reactコンポーネント
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── RegisterForm.tsx
+│   │   │   ├── LearningRecordForm.tsx
+│   │   │   └── LearningRecordList.tsx
+│   │   │
+│   │   ├── contexts/       # Reactコンテキスト
+│   │   │   └── AuthContext.tsx  # 認証状態管理
+│   │   │
+│   │   ├── pages/         # ページコンポーネント
+│   │   │   ├── AuthPage.tsx
+│   │   │   └── LearningRecordPage.tsx
+│   │   │
+│   │   ├── types/        # TypeScript型定義
+│   │   │   └── LearningRecord.ts
+│   │   │
+│   │   ├── App.tsx       # メインアプリケーション
+│   │   └── main.tsx      # エントリーポイント
+│   │
+│   └── index.html        # HTMLテンプレート
+│
+└── docker-compose.yml    # Docker設定
