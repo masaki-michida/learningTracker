@@ -31,4 +31,4 @@ public class User {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-} 
+} JPA/Hibernate

@@ -16,11 +16,12 @@ MVCアーキテクチャ
 RESTful API+React
 
 データの流れ
-クライアント（React）からリクエスト
-Controller（@RestController）がリクエストを受け取る
+クライアント（React）からHTTPリクエスト
+Controller（@RestController）がリクエストを受け取り、エンティティに変換してServiceに渡す
 Service（@Service）でビジネスロジックを処理
 Repository（@Repository）でデータベース操作
-結果をControllerを通じてクライアントに返す
+model(entity)でデータベースのテーブルとアプリケーションのデータをつなぐ
+controllerでエンティティをdtoに変換してクライアントに返す
 
 疑問
 getter...変数を取り出すだけのメソッド

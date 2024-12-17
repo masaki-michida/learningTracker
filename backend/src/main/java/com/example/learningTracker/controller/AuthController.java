@@ -5,6 +5,7 @@ import com.example.learningTracker.repository.UserRepository;
 import com.example.learningTracker.service.AuthService;
 import com.example.learningTracker.dto.LoginRequest;
 import com.example.learningTracker.dto.LoginResponse;
+import com.example.learningTracker.dto.RegisterRequest;
 import com.example.learningTracker.dto.RegisterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,9 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
+            User user = convertToEntity(request);
             User registeredUser = authService.registerUser(user);
             return ResponseEntity.ok(new RegisterResponse("ユーザー登録が完了しました"));
         } catch (RuntimeException e) {
@@ -42,9 +44,22 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             User user = authService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(new LoginResponse("ログイン成功"));
+            LoginResponse response = convertToResponse(user);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new LoginResponse(e.getMessage()));
         }
+    }
+
+    private User convertToEntity(RegisterRequest request) {
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        return user;
+    }
+
+    private LoginResponse convertToResponse(User user) {
+        return new LoginResponse("ログイン成功");
     }
 } 
