@@ -1,0 +1,45 @@
+API
+@RequestMapping("/api/auth")
+urlにapiがついているのはフロントエンドからのアクセスのため(apiエンドポイント)
+メリットはweb,api,mobileを分けて管理できること
+セキュリティ設定も分けて管理できること
+
+フロントエンドとバックエンドの間でデータをやり取りするための通信手段
+コントローラーに書く
+pom.xml,package.json
+ビルド設定や使用するライブラリとバージョンを記述するファイル
+@（アノテーション）について
+フレームワークやライブラリで何をするか指示するために書くもの
+
+jwt(json web token)とは
+Json形式のデータを格納して署名付きでやり取りをするトークン、署名付きなので
+改善の検知が可能
+
+基本構造
+ヘッダー.Header + ペイロード.Payload + 署名.Signature
+header
+{
+    "alg": "HS256",//署名アルゴリズム
+    "typ": "jwt"//トークンのタイプ
+}
+payload
+{
+    "sub": "1234567890",//ユーザーID
+    "name": "John Doe",//ユーザー名
+    "iat": 1516239022,//発行時間
+    "exp": 1516239022,//有効期限
+    "iss": "https://example.com",//発行者
+    "aud": "https://example.com",//受信者
+}
+signature
+HMACSHA256(
+    base64UrlEncode(header) + "." + base64UrlEncode(payload),
+    secret
+)
+
+役割
+1
+ユーザーがログインすると、サーバーはユーザーにjwtトークンを発行してクライアントに渡す
+クライアントはリクエストヘッダーにトークンを含めて送信する
+
+2

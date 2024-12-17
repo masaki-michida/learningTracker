@@ -27,6 +27,9 @@ public class User {
     
     private LocalDateTime createdAt;
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<LearningRecord> learningRecords;
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
