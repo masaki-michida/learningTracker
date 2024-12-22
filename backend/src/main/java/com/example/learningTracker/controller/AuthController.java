@@ -1,7 +1,6 @@
 package com.example.learningTracker.controller;
 
 import com.example.learningTracker.model.User;
-import com.example.learningTracker.repository.UserRepository;
 import com.example.learningTracker.service.AuthService;
 import com.example.learningTracker.dto.LoginRequest;
 import com.example.learningTracker.dto.LoginResponse;
@@ -18,22 +17,17 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuthController.class);
-
     @Autowired
-    private UserRepository userRepository;
+    private AuthService authService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             User user = convertToEntity(request);
-            User registeredUser = authService.registerUser(user);
+            authService.registerUser(user);
             return ResponseEntity.ok(new RegisterResponse("ユーザー登録が完了しました"));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new RegisterResponse(e.getMessage()));
@@ -44,10 +38,10 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             User user = authService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
-            LoginResponse response = convertToResponse(user);
-            return ResponseEntity.ok(response);
+            String token = authService.generateToken(user);
+            return ResponseEntity.ok(new LoginResponse("ログイン成功", token));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new LoginResponse(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new LoginResponse(e.getMessage(), null));
         }
     }
 
@@ -55,11 +49,7 @@ public class AuthController {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         return user;
-    }
-
-    private LoginResponse convertToResponse(User user) {
-        return new LoginResponse("ログイン成功");
     }
 } 

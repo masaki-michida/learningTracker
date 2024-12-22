@@ -23,12 +23,12 @@ public class LearningRecordController {
     @PostMapping
     public ResponseEntity<LearningRecordResponse> create(@Valid @RequestBody LearningRecordRequest request) {
         // RequestDTOからエンティティに変換
-        LearningRecord record = new LearningRecord();
-        record.setTitle(request.getTitle());
-        record.setContent(request.getContent());
+        LearningRecord record = new LearningRecord();//ラーニングモデルクラスをインスタンス化か
+        record.setTitle(request.getTitle());//インスタンスにリクエストの
+        record.setContent(request.getContent());//インスタンス
         record.setStudyMinutes(request.getStudyMinutes());
         
-        // 保存
+        // サービスクラスのcreateRecordメソッドを呼び出して、エンティティを保存
         LearningRecord saved = learningRecordService.createRecord(record);
         
         // エンティティからResponseDTOに変換
