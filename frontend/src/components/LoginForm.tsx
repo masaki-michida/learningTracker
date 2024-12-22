@@ -22,6 +22,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
             if (response.ok) {
                 const data = await response.json();
                 onLogin(data.token);
+            } else {
+                console.error('Login failed:', response.statusText);
             }
         } catch (error) {
             console.error('Login error:', error);
