@@ -3,18 +3,38 @@ import LearningRecordForm from '../components/LearningRecordForm';
 import LearningRecordList from '../components/LearningRecordList';
 import { LearningRecord } from '../types/LearningRecord';
 import { useAuth } from '../contexts/AuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const LearningRecordPage: React.FC = () => {
     const { logout } = useAuth();
     const [records, setRecords] = useState<LearningRecord[]>([]);
 
+    interface DecodedToken {
+        id:number;
+    }
+
     // 学習記録を取得する関数
-    const fetchRecords = async () => {
+    const fetchRecords = async (id: number) => {
         try {
-            const response = await fetch('http://localhost:8080/api/learning-records');
+            
+            const token = localStorage.getItem('token'); // トークンを取得
+            if(token){
+                const decoded = jwtDecode(token);
+                console.log(decoded);
+            }
+            const response = await fetch(`http://localhost:8080/api/learning-records/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Authorizationヘッダーを設定
+                }
+            });
+
             if (response.ok) {
                 const data = await response.json();
                 setRecords(data);
+            } else {
+                console.error('Failed to fetch records:', response.statusText);
             }
         } catch (error) {
             console.error('Error fetching records:', error);
@@ -37,9 +57,24 @@ const LearningRecordPage: React.FC = () => {
 
     // コンポーネントマウント時に記録を取得
     useEffect(() => {
-        fetchRecords();
-    }, []);
+        const token = localStorage.getItem('token');
 
+        if(token){
+            const decoded: DecodedToken = jwtDecode(token);
+            const userID = decoded.id;
+            fetchRecords(userID);
+        }
+    },[]);
+
+    const handleRecordSubmit = ()=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            const decoded: DecodedToken = jwtDecode(token);
+            const userID = decoded.id;
+            fetchRecords(userID);
+        }
+
+    }
     return (
         <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
@@ -51,10 +86,10 @@ const LearningRecordPage: React.FC = () => {
                     ログアウト
                 </button>
             </div>
-            <LearningRecordForm onRecordSubmit={fetchRecords} />
+            <LearningRecordForm onRecordSubmit={handleRecordSubmit } />
             <LearningRecordList records={records} onDelete={handleDelete} />
         </div>
     );
 };
 
-export default LearningRecordPage; 
+export default LearningRecordPage;
