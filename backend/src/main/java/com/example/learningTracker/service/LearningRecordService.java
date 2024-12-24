@@ -18,8 +18,8 @@ public class LearningRecordService {
         return learningRecordRepository.save(record);
     }
     
-    public List<LearningRecord> getAllRecords() {
-        return learningRecordRepository.findAll();
+    public List<LearningRecord> getAllRecordsByUserId(Long userId) {
+        return learningRecordRepository.findByUserId(userId);
     }
     
     public LearningRecord getRecordById(Long id) {

@@ -3,9 +3,11 @@ package com.example.learningTracker.controller;
 import com.example.learningTracker.dto.LearningRecordRequest;
 import com.example.learningTracker.dto.LearningRecordResponse;
 import com.example.learningTracker.model.LearningRecord;
+import com.example.learningTracker.model.User;
 import com.example.learningTracker.service.LearningRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -38,8 +40,9 @@ public class LearningRecordController {
 
     // 全ての学習記録を取得
     @GetMapping
-    public ResponseEntity<List<LearningRecordResponse>> getAllRecords() {
-        List<LearningRecord> records = learningRecordService.getAllRecords();
+    public ResponseEntity<List<LearningRecordResponse>> getAllRecordsByUserId(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        List<LearningRecord> records = learningRecordService.getAllRecordsByUserId(user.getId());
         List<LearningRecordResponse> responses = records.stream()
             .map(this::convertToResponse)
             .collect(Collectors.toList());

@@ -3,26 +3,18 @@ import LearningRecordForm from '../components/LearningRecordForm';
 import LearningRecordList from '../components/LearningRecordList';
 import { LearningRecord } from '../types/LearningRecord';
 import { useAuth } from '../contexts/AuthContext';
-import { jwtDecode } from 'jwt-decode';
+
 
 const LearningRecordPage: React.FC = () => {
     const { logout } = useAuth();
     const [records, setRecords] = useState<LearningRecord[]>([]);
 
-    interface DecodedToken {
-        id:number;
-    }
-
     // 学習記録を取得する関数
-    const fetchRecords = async (id: number) => {
+    const fetchRecords = async () => {
         try {
             
             const token = localStorage.getItem('token'); // トークンを取得
-            if(token){
-                const decoded = jwtDecode(token);
-                console.log(decoded);
-            }
-            const response = await fetch(`http://localhost:8080/api/learning-records/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/learning-records`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,8 +36,12 @@ const LearningRecordPage: React.FC = () => {
     // 学習記録を削除する関数
     const handleDelete = async (id: number) => {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:8080/api/learning-records/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // トークンを追加
+                }
             });
             if (response.ok) {
                 setRecords(records.filter(record => record.id !== id));
@@ -56,25 +52,10 @@ const LearningRecordPage: React.FC = () => {
     };
 
     // コンポーネントマウント時に記録を取得
-    useEffect(() => {
-        const token = localStorage.getItem('token');
+    useEffect(() => {        
+            fetchRecords();
+    }, []);
 
-        if(token){
-            const decoded: DecodedToken = jwtDecode(token);
-            const userID = decoded.id;
-            fetchRecords(userID);
-        }
-    },[]);
-
-    const handleRecordSubmit = ()=>{
-        const token = localStorage.getItem('token');
-        if(token){
-            const decoded: DecodedToken = jwtDecode(token);
-            const userID = decoded.id;
-            fetchRecords(userID);
-        }
-
-    }
     return (
         <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
@@ -86,7 +67,7 @@ const LearningRecordPage: React.FC = () => {
                     ログアウト
                 </button>
             </div>
-            <LearningRecordForm onRecordSubmit={handleRecordSubmit } />
+            <LearningRecordForm onRecordSubmit={fetchRecords} />
             <LearningRecordList records={records} onDelete={handleDelete} />
         </div>
     );
