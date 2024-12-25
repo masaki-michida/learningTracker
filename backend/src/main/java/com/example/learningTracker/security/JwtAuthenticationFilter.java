@@ -40,30 +40,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
             logger.debug("JWT Token received: {}", jwt);
-            
+            logger.debug("Request URI: {}", request.getRequestURI());
+            logger.debug("Authorization header: {}", request.getHeader("Authorization"));
+
             if (StringUtils.hasText(jwt)) {
-                Claims claims = Jwts.parser()
-                    .setSigningKey(jwtSecret)
-                    .parseClaimsJws(jwt)
-                    .getBody();
-                
-                String email = claims.getSubject();
-                logger.debug("Email extracted from JWT: {}", email);
-                
-                User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
-                
-                UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                    );
-                
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                try {
+                    Claims claims = Jwts.parser()
+                        .setSigningKey(jwtSecret)
+                        .parseClaimsJws(jwt)
+                        .getBody();
+                    
+                    String email = claims.getSubject();
+                    logger.debug("Email from token: {}", email);
+                    
+                    User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                    
+                    UsernamePasswordAuthenticationToken authentication = 
+                        new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                        );
+                    
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (Exception e) {
+                    logger.error("Token parsing error: ", e);
+                }
+            } else {
+                logger.debug("No JWT token found in request");
             }
         } catch (Exception ex) {
-            logger.error("認証処理中にエラーが発生しました", ex);
+            logger.error("Authentication error: ", ex);
         }
         
         filterChain.doFilter(request, response);

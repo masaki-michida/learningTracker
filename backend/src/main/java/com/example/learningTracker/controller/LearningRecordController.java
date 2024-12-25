@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/learning-records")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class LearningRecordController {
     
     @Autowired
@@ -23,12 +24,14 @@ public class LearningRecordController {
     
     // 学習記録の作成
     @PostMapping
-    public ResponseEntity<LearningRecordResponse> create(@Valid @RequestBody LearningRecordRequest request) {
+    public ResponseEntity<LearningRecordResponse> create(@Valid @RequestBody LearningRecordRequest request, Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
         // RequestDTOからエンティティに変換
         LearningRecord record = new LearningRecord();//ラーニングモデルクラスをインスタンス化か
         record.setTitle(request.getTitle());//インスタンスにリクエストの
         record.setContent(request.getContent());//インスタンス
         record.setStudyMinutes(request.getStudyMinutes());
+        record.setUser(currentUser);
         
         // サービスクラスのcreateRecordメソッドを呼び出して、エンティティを保存
         LearningRecord saved = learningRecordService.createRecord(record);

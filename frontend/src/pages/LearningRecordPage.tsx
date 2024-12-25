@@ -12,22 +12,33 @@ const LearningRecordPage: React.FC = () => {
     // 学習記録を取得する関数
     const fetchRecords = async () => {
         try {
-            
-            const token = localStorage.getItem('token'); // トークンを取得
-            const response = await fetch(`http://localhost:8080/api/learning-records`, {
+            const token = localStorage.getItem('token');
+            console.log('Stored token:', token);  // トークンの内容を確認
+
+            if (!token) {
+                throw new Error('認証トークンがありません');
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            console.log('Request headers:', headers);  // リクエストヘッダーを確認
+
+            const response = await fetch('http://localhost:8080/api/learning-records', {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Authorizationヘッダーを設定
-                }
+                headers: headers
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setRecords(data);
-            } else {
-                console.error('Failed to fetch records:', response.statusText);
+            if (!response.ok) {
+                console.log('Response status:', response.status);  // デバッグ用
+                const errorText = await response.text();  // デバッグ用
+                console.log('Error response:', errorText);  // デバッグ用
+                throw new Error(`Error: ${response.status}`);
             }
+
+            const data = await response.json();
+            setRecords(data);
         } catch (error) {
             console.error('Error fetching records:', error);
         }
